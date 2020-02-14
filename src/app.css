@@ -1,0 +1,27 @@
+html, body {
+  width: 100vw;
+  height: 100vh;
+  background: #eee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 24px;
+}
+
+.editor {
+  width: 70vw;
+  height: 60vh;
+  background: #fff;
+  box-shadow: 0 30px 60px rgba(25, 128, 206, 0.27);
+  padding: 20px;
+  border-radius: 25px;
+}
+
+.format-toolbar {
+  display: flex;
+  border-bottom: solid 1.7px #eee;
+  padding: 10px 0;
+  margin: 0 0 1px 0;
+}
