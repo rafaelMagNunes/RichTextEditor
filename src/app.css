@@ -10,18 +10,36 @@ html, body {
   font-size: 24px;
 }
 
-.editor {
+.editor .text-editor {
   width: 70vw;
-  height: 60vh;
+  height: 60%;
+  min-height: 60vh;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: #fff;
   box-shadow: 0 30px 60px rgba(25, 128, 206, 0.27);
-  padding: 20px;
-  border-radius: 25px;
+  padding: 15px;
+  border-bottom-left-radius: 25px;
+  border-bottom-right-radius: 25px;
 }
 
 .format-toolbar {
   display: flex;
-  border-bottom: solid 1.7px #eee;
   padding: 10px 0;
   margin: 0 0 1px 0;
+  width: 70vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  background: #fff;
+  padding: 15px;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  margin-bottom: 0px;
+}
+
+.tooltip-icon-button {
+  border: 0;
+  cursor: pointer;
+  color: #000;
 }

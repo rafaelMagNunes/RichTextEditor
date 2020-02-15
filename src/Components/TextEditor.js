@@ -3,6 +3,8 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { Slate, Editable, withReact } from "slate-react";
 import { createEditor, Editor, Transforms, Text } from "slate";
+import Icon from 'react-icons-kit';
+import { bold, code, italic, list, underline } from 'react-icons-kit/feather';
 import { FormatToolbar } from "./index";
 
 const CustomEditor = {
@@ -18,6 +20,31 @@ const CustomEditor = {
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: n => n.type === "code"
+    });
+
+    return !!match;
+  },
+
+  isListActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: n => n.type === "list"
+    });
+
+    return !!match;
+  },
+
+  isUnderlineActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: n => n.type === "underline"
+    });
+
+    return !!match;
+  },
+
+  isItalicActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: n => n.italic === true,
+      universal: true
     });
 
     return !!match;
@@ -39,14 +66,57 @@ const CustomEditor = {
       { type: isActive ? null : "code" },
       { match: n => Editor.isBlock(editor, n) }
     );
+  },
+
+  toggleList(editor) {
+    const isActive = CustomEditor.isListActive(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "list" },
+      { match: n => Editor.isBlock(editor, n) }
+    );
+  },
+
+  toggleUnderline(editor) {
+    const isActive = CustomEditor.isUnderlineActive(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "underline" },
+      { match: n => Editor.isBlock(editor, n) }
+    );
+  },
+
+  toggleItalic(editor) {
+    const isActive = CustomEditor.isItalicActive(editor);
+    Transforms.setNodes(
+      editor,
+      { italic: isActive ? null : true },
+      { match: n => Text.isText(n), split: true }
+    );
   }
 };
 
 const CodeElement = props => {
   return (
-    <pre {...props.attributes}>
+    <pre style={{background: '#eee', width:'100%', padding: 7, borderLeft: 'solid red 2px'}} {...props.attributes}>
       <code>{props.children}</code>
     </pre>
+  );
+};
+
+const ListElement = props => {
+  return (
+    <ul {...props.attributes}>
+      <li>{props.children}</li>
+    </ul>
+  );
+};
+
+const UnderlineElement = props => {
+  return (
+    <u {...props.attributes}>
+      {props.children}
+    </u>
   );
 };
 
@@ -55,14 +125,57 @@ const DefaultElement = props => {
 };
 
 const Leaf = props => {
-  return (
-    <span
-      {...props.attributes}
-      style={{ fontWeight: props.leaf.bold ? "bold" : "normal" }}
-    >
-      {props.children}
-    </span>
-  );
+  if (props.leaf.bold) {
+    if (props.leaf.italic) {
+      return (
+        <span
+          {...props.attributes}
+          style={{ fontWeight: "bold", fontStyle: "italic"}}
+        >
+          {props.children}
+        </span>
+      );
+    } else {
+      return (
+        <span
+          {...props.attributes}
+          style={{ fontWeight: "bold"}}
+        >
+          {props.children}
+        </span>
+      );
+    }
+  } else if (props.leaf.italic) {
+    if (props.leaf.bold) {
+      return (
+        <span
+          {...props.attributes}
+          style={{ fontStyle: "italic", fontWeight: "bold"}}
+        >
+          {props.children}
+        </span>
+      );
+    } else {
+      return (
+        <span
+          {...props.attributes}
+          style={{ fontStyle: "italic"}}
+        >
+          {props.children}
+        </span>
+      );
+    }
+  } else {
+    return (
+      <span
+        {...props.attributes}
+        style={{ fontWeight: "normal"}}
+      >
+        {props.children}
+      </span>
+    );
+  }
+  
 };
 
 export default function TextEditor() {
@@ -78,6 +191,10 @@ export default function TextEditor() {
     switch (props.element.type) {
       case "code":
         return <CodeElement {...props} />;
+      case "list":
+        return <ListElement {... props} />;
+      case "underline":
+        return <UnderlineElement {... props} />;
       default:
         return <DefaultElement {...props} />;
     }
@@ -93,24 +210,55 @@ export default function TextEditor() {
         <div>
           <FormatToolbar>
             <button
+              className="tooltip-icon-button"
               onMouseDown={event => {
                 event.preventDefault();
                 CustomEditor.toggleBoldMark(editor);
               }}
             >
-              Bold
+              <Icon icon={bold} />
             </button>
             <button
+              className="tooltip-icon-button"
+              onMouseDown={event => {
+                event.preventDefault();
+                CustomEditor.toggleItalic(editor);
+              }}
+            >
+              <Icon icon={italic} />
+            </button>
+            <button
+              className="tooltip-icon-button"
               onMouseDown={event => {
                 event.preventDefault();
                 CustomEditor.toggleCodeBlock(editor);
               }}
             >
-              Code Block
+              <Icon icon={code} />
             </button>
+            <button
+              className="tooltip-icon-button"
+              onMouseDown={event => {
+                event.preventDefault();
+                CustomEditor.toggleList(editor);
+              }}
+            >
+              <Icon icon={list} />
+            </button>
+            <button
+              className="tooltip-icon-button"
+              onMouseDown={event => {
+                event.preventDefault();
+                CustomEditor.toggleUnderline(editor);
+              }}
+            >
+              <Icon icon={underline} />
+            </button>
+            
           </FormatToolbar>
         </div>
         <Editable
+          className="text-editor"
           editor={editor}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
@@ -129,6 +277,17 @@ export default function TextEditor() {
               case "b": {
                 event.preventDefault();
                 CustomEditor.toggleBoldMark(editor);
+                break;
+              }
+
+              case "i": {
+                event.preventDefault();
+                CustomEditor.toggleItalic(editor);
+                break;
+              }
+              case "l": {
+                event.preventDefault();
+                CustomEditor.toggleList(editor);
                 break;
               }
             }
