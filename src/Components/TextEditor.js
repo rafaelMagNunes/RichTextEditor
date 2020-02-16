@@ -5,6 +5,8 @@ import { Slate, Editable, withReact } from "slate-react";
 import { createEditor, Editor, Transforms, Text } from "slate";
 import Icon from 'react-icons-kit';
 import { bold, code, italic, list, underline } from 'react-icons-kit/feather';
+import { quotesRight } from 'react-icons-kit/icomoon/quotesRight';
+
 import { FormatToolbar } from "./index";
 
 const CustomEditor = {
@@ -20,6 +22,14 @@ const CustomEditor = {
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: n => n.type === "code"
+    });
+
+    return !!match;
+  },
+
+  isQuoteActive(editor) {
+    const [match] = Editor.nodes(editor, {
+      match: n => n.type === "quote"
     });
 
     return !!match;
@@ -68,6 +78,15 @@ const CustomEditor = {
     );
   },
 
+  toggleQuote(editor) {
+    const isActive = CustomEditor.isQuoteActive(editor);
+    Transforms.setNodes(
+      editor,
+      { type: isActive ? null : "quote" },
+      { match: n => Editor.isBlock(editor, n) }
+    );
+  },
+
   toggleList(editor) {
     const isActive = CustomEditor.isListActive(editor);
     Transforms.setNodes(
@@ -98,11 +117,19 @@ const CustomEditor = {
 
 const CodeElement = props => {
   return (
-    <pre style={{background: '#eee', width:'100%', padding: 7, borderLeft: 'solid red 2px'}} {...props.attributes}>
+    <pre {...props.attributes}>
       <code>{props.children}</code>
     </pre>
   );
 };
+
+const QuoteElement = props => {
+  return (
+    <blockquote className="code-element" {...props.attributes}>
+       <q>{props.children}</q>
+    </blockquote>
+  )
+}
 
 const ListElement = props => {
   return (
@@ -195,6 +222,8 @@ export default function TextEditor() {
         return <ListElement {... props} />;
       case "underline":
         return <UnderlineElement {... props} />;
+      case "quote": 
+        return <QuoteElement {...props} />
       default:
         return <DefaultElement {...props} />;
     }
@@ -254,7 +283,15 @@ export default function TextEditor() {
             >
               <Icon icon={underline} />
             </button>
-            
+            <button
+              className="tooltip-icon-button"
+              onMouseDown={event => {
+                event.preventDefault();
+                CustomEditor.toggleQuote(editor);
+              }}
+            >
+              <Icon icon={quotesRight} />
+            </button>
           </FormatToolbar>
         </div>
         <Editable
@@ -285,9 +322,16 @@ export default function TextEditor() {
                 CustomEditor.toggleItalic(editor);
                 break;
               }
+
               case "l": {
                 event.preventDefault();
                 CustomEditor.toggleList(editor);
+                break;
+              }
+
+              case "q": {
+                event.preventDefault();
+                CustomEditor.toggleQuote(editor);
                 break;
               }
             }

@@ -1,13 +1,14 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  background: #eee;
+  background: #eeefff;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 24px;
+  overflow: hidden;
 }
 
 .editor .text-editor {
@@ -15,6 +16,7 @@ html, body {
   height: 60%;
   min-height: 60vh;
   max-height: 80vh;
+  max-width: 70vw;
   overflow-y: auto;
   overflow-x: hidden;
   background: #fff;
@@ -42,4 +44,23 @@ html, body {
   border: 0;
   cursor: pointer;
   color: #000;
+  margin-left: 30px;
+  padding: 10px;
+}
+
+.tooltip-icon-button:hover {
+  background: #eee;
+  border-radius: 50%;
+}
+
+.code-element {
+  background: #eee;
+  padding: 20px;
+  border-left: solid red 4px;
+  display: flex;
+  justify-content: start;
+}
+
+.code-element span {
+  max-width: 100%;
 }
